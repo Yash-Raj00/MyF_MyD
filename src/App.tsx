@@ -1,15 +1,30 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import { useEffect, useState } from "react";
 import WritingCard from "./components/WritingCard";
-import { dummyWritings } from "./data/writingsData";
-import random_emoji from "./assets/rand_emojis.svg";
-import Footer from "./components/Footer";
+// import { dummyWritings } from "./data/writingsData";
+import AddStoryPanel from "./components/AddStoryPanel";
+import { Writing } from "./types/writing";
 
 function App() {
-  const [stories, setStories] = useState(dummyWritings);
+  const [stories, setStories] = useState([] as Writing[]);
+
+  const fetchStories = async () => {
+    try {
+      fetch("http://localhost:3000/api/stories")
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          setStories(data);
+        });
+    } catch (error) {
+      console.log("Error fetching stories", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStories();
+  }, []);
+
   const handleSpecial = (id: number, isSpecial: boolean) => {
-    // console.log("Clicked on", id, "is", isSpecial);
     setStories((prevStories) =>
       prevStories.map((story) =>
         story.id === id ? { ...story, isSpecial: !isSpecial } : story
@@ -19,6 +34,11 @@ function App() {
   const handleDeleteStory = (id: number) => {
     setStories((prevStories) => prevStories.filter((story) => story.id !== id));
   };
+  const [showAddStoryPanel, setShowAddStoryPanel] = useState(false);
+  const handleAddStoryPanel = () => {
+    setShowAddStoryPanel((prev) => !prev);
+  };
+
   return (
     <div className="container mx-auto px-4 md:px-0">
       <header
@@ -44,7 +64,12 @@ function App() {
           />
         ))}
       </main>
-      <Footer />
+      <AddStoryPanel
+        stories={stories}
+        setStories={setStories}
+        showAddStoryPanel={showAddStoryPanel}
+        togglePanel={handleAddStoryPanel}
+      />
     </div>
   );
 }
