@@ -6,24 +6,21 @@ import EmojiPicker, { Theme } from "emoji-picker-react";
 import BottomButtons from "./BottomButtons";
 import { IoBackspaceSharp } from "react-icons/io5";
 import { ImCross } from "react-icons/im";
-import { Writing } from "../types/writing";
+import { WritingSend } from "../types/writing";
 
 export type AddStoryPanelProps = {
-  stories: Writing[];
-  setStories: (stories: Writing[]) => void;
   showAddStoryPanel: boolean;
   togglePanel: () => void;
+  handleAddStory: (story: WritingSend) => void;
 };
 
 function AddStoryPanel({
-  stories,
-  setStories,
   showAddStoryPanel,
   togglePanel,
+  handleAddStory,
 }: AddStoryPanelProps) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [story, setStory] = useState({
-    id: 0,
     title: "",
     content: "",
     date: new Date().toLocaleDateString("en-UK", {
@@ -42,14 +39,8 @@ function AddStoryPanel({
   //     }
   //   };
 
-  function handleTitleChange(newTitle: string) {
-    if (newTitle.length < 40) {
-      setStory((prev) => ({ ...prev, title: newTitle }));
-    }
-  }
   function emptyStory() {
     setStory({
-      id: 0,
       title: "",
       content: "",
       date: new Date().toLocaleDateString("en-UK", {
@@ -68,16 +59,15 @@ function AddStoryPanel({
         "Title must be atleast 5 characters and Content must be atleast 10 characters long."
       );
       return;
+    } else {
+      handleAddStory(story);
     }
-    story.id = stories.length;
-    let newStories = stories;
-    newStories.push(story);
-    setStories(newStories);
     console.log(story);
     emptyStory();
     setShowEmojiPicker(false);
     togglePanel();
   }
+
   return (
     <>
       <BottomButtons
@@ -115,7 +105,9 @@ function AddStoryPanel({
                     type="text"
                     placeholder="Enter Title.."
                     value={story.title}
-                    onChange={(e) => handleTitleChange(e.target.value)}
+                    onChange={(e) =>
+                      setStory((prev) => ({ ...prev, title: e.target.value }))
+                    }
                     className="px-1 text-lg md:text-xl w-full font-semibold focus:outline-none rounded-sm"
                   />
                 </span>
@@ -170,7 +162,7 @@ function AddStoryPanel({
                   previewConfig={{
                     showPreview: false,
                   }}
-                  onEmojiClick={(emoji, event) => {
+                  onEmojiClick={(emoji) => {
                     let newEmojis = story.emojis;
                     if (
                       newEmojis.length === 3 ||

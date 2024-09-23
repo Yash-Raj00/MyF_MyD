@@ -1,28 +1,19 @@
-// import React from 'react'
-
 import { GoStar, GoStarFill } from "react-icons/go";
-import { Writing } from "../types/writing";
+import { WritingReceived } from "../types/writing";
 import { FaTrash } from "react-icons/fa";
 import { MdDoneOutline, MdMovieEdit } from "react-icons/md";
 import { useState } from "react";
-import { ImCross } from "react-icons/im";
 
 export type WritingCardProps = {
-  data: Writing;
-  toggleSpecial: (id: number, isSpecial: boolean) => void;
-  deleteStory: (id: number) => void;
+  data: WritingReceived;
+  toggleSpecial: (id: string, isSpecial: boolean) => void;
+  deleteStory: (id: string) => void;
+  updateStory: (story: WritingReceived) => void;
 };
 
-function WritingCard({ data, toggleSpecial, deleteStory }: WritingCardProps) {
+function WritingCard({ data, toggleSpecial, deleteStory, updateStory }: WritingCardProps) {
   const [storyForm, setStoryForm] = useState(data);
   const [editingStory, setEditingStory] = useState(false);
-
-  function editStory() {
-    setEditingStory(true);
-  }
-  function cancelEditStory() {
-    setEditingStory(false);
-  }
 
   return (
     <div
@@ -35,7 +26,7 @@ function WritingCard({ data, toggleSpecial, deleteStory }: WritingCardProps) {
           <span className="flex gap-2 items-center border-b-2 border-gray-600/80 pb-1">
             <span
               className="py-1 px-1 border border-yellow-500/50 rounded-t-md flex items-center cursor-pointer"
-              onClick={() => toggleSpecial(data.id, data.isSpecial)}
+              onClick={() => toggleSpecial(data._id, data.isSpecial)}
             >
               {data.isSpecial ? (
                 <GoStarFill className={`w-4 h-4  text-yellow-500/80`} />
@@ -65,14 +56,19 @@ function WritingCard({ data, toggleSpecial, deleteStory }: WritingCardProps) {
               onClick={() => setEditingStory(!editingStory)}
             >
               {editingStory ? (
-                <MdDoneOutline className="w-[22px] h-[22px] transition-all hover:text-gray-400/90" />
+                <MdDoneOutline className="w-[22px] h-[22px] transition-all hover:text-gray-400/90"
+                onClick={() => {
+                  updateStory(storyForm);
+                  setEditingStory(false);
+                }}
+                />
               ) : (
                 <MdMovieEdit className="w-[22px] h-[22px] transition-all hover:text-gray-400/90" />
               )}
             </span>
             <span
               className="cursor-pointer "
-              onClick={() => deleteStory(data.id)}
+              onClick={() => deleteStory(data._id)}
             >
               <FaTrash className="w-4 h-4 transition-colors hover:text-gray-400/90" />
             </span>
