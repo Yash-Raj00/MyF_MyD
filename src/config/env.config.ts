@@ -1,4 +1,3 @@
-export default {
-  BG_GRADIENT: import.meta.env.VITE_LOGO_BG_GRADIENT,
-  API_URL: import.meta.env.VITE_API_URL,
-};
+export const BG_GRADIENT = import.meta.env.VITE_BG_GRADIENT;
+export const API_URL = import.meta.env.VITE_API_URL;
+

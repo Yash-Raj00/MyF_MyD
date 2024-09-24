@@ -3,7 +3,7 @@ import WritingCard from "./components/WritingCard";
 import AddStoryPanel from "./components/AddStoryPanel";
 import { WritingReceived } from "./types/writing";
 import { useQuery } from "@tanstack/react-query";
-import ENV from "./config/env.config";
+import {API_URL} from "./config/env.config";
 function App() {
   const [stories, setStories] = useState([] as WritingReceived[]);
 
@@ -20,7 +20,7 @@ function App() {
     let response = [];
     try {
       // console.log(API_URL.API_URL)
-      const res = await fetch(ENV.API_URL+"/api/stories");
+      const res = await fetch(API_URL+"/api/stories");
       response = await res.json();
       setStories(response.data ?? []);
       return response;

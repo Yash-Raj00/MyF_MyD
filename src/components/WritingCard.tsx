@@ -4,7 +4,7 @@ import { FaTrash } from "react-icons/fa";
 import { MdDoneOutline, MdMovieEdit } from "react-icons/md";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import ENV from "../config/env.config";
+import { API_URL } from "../config/env.config";
 
 export type WritingCardProps = {
   data: WritingReceived;
@@ -30,7 +30,7 @@ function WritingCard({ data }: WritingCardProps) {
 
   async function deleteStory(id: string) {
     try {
-      const response = await fetch(ENV.API_URL+"/api/story/delete", {
+      const response = await fetch(API_URL+"/api/story/delete", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -48,7 +48,7 @@ function WritingCard({ data }: WritingCardProps) {
 
   async function udpateStory(story: WritingReceived) {
     try {
-      const response = await fetch(ENV.API_URL+"/api/story/update", {
+      const response = await fetch(API_URL+"/api/story/update", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

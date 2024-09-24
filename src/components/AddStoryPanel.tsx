@@ -12,7 +12,7 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
-import ENV from "../config/env.config";
+import { API_URL } from "../config/env.config";
 
 export type AddStoryPanelProps = {
   handleAddStory: UseMutateAsyncFunction<void, Error, WritingReceived, unknown>;
@@ -67,7 +67,7 @@ function AddStoryPanel() {
 
   async function addStory(story: WritingSend) {
     try {
-      const response = await fetch(ENV.API_URL + "/api/story/add", {
+      const response = await fetch(API_URL + "/api/story/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
