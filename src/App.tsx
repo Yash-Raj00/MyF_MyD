@@ -20,7 +20,7 @@ function App() {
     let response = [];
     try {
       // console.log(API_URL.API_URL)
-      const res = await fetch(ENV.API_URL + "/api/stories");
+      const res = await fetch(ENV.API_URL+"/api/stories");
       response = await res.json();
       setStories(response.data ?? []);
       return response;
