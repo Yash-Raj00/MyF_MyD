@@ -6,20 +6,24 @@ import EmojiPicker, { Theme } from "emoji-picker-react";
 import BottomButtons from "./BottomButtons";
 import { IoBackspaceSharp } from "react-icons/io5";
 import { ImCross } from "react-icons/im";
-import { WritingSend } from "../types/writing";
+import { WritingReceived, WritingSend } from "../types/writing";
+import {
+  UseMutateAsyncFunction,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 
 export type AddStoryPanelProps = {
-  showAddStoryPanel: boolean;
-  togglePanel: () => void;
-  handleAddStory: (story: WritingSend) => void;
+  handleAddStory: UseMutateAsyncFunction<void, Error, WritingReceived, unknown>;
 };
 
-function AddStoryPanel({
-  showAddStoryPanel,
-  togglePanel,
-  handleAddStory,
-}: AddStoryPanelProps) {
+function AddStoryPanel() {
+  const queryClient = useQueryClient();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showAddStoryPanel, setShowAddStoryPanel] = useState(false);
+  const handleAddStoryPanel = () => {
+    setShowAddStoryPanel((prev) => !prev);
+  };
   const [story, setStory] = useState({
     title: "",
     content: "",
@@ -31,6 +35,12 @@ function AddStoryPanel({
     emojis: Array<string>(),
     tags: Array<string>(),
     isSpecial: false,
+  });
+  const { mutateAsync: addStoryMutation } = useMutation({
+    mutationFn: addStory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["stories"] });
+    },
   });
 
   //   const handleClickOutside = (event) => {
@@ -53,27 +63,44 @@ function AddStoryPanel({
       isSpecial: false,
     });
   }
-  function handleStorySubmit() {
+
+  async function addStory(story: WritingSend) {
+    try {
+      const response = await fetch("http://localhost:3000/api/story/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(story),
+      });
+      if (response.ok) {
+        queryClient.invalidateQueries({ queryKey: ["stories"] });
+        // console.log("Story added to DB successfully");
+        // fetchStories();
+      }
+    } catch (error) {
+      console.log("Error adding story to DB", error);
+    }
+  }
+
+  async function handleStorySubmit() {
     if (story.title.length < 5 || story.content.length < 10) {
       alert(
         "Title must be atleast 5 characters and Content must be atleast 10 characters long."
       );
       return;
     } else {
-      handleAddStory(story);
+      await addStoryMutation(story);
     }
-    console.log(story);
+    // console.log(story);
     emptyStory();
     setShowEmojiPicker(false);
-    togglePanel();
+    handleAddStoryPanel();
   }
 
   return (
     <>
-      <BottomButtons
-        togglePanel={togglePanel}
-        // showAddStoryPanel={showAddStoryPanel}
-      />
+      <BottomButtons togglePanel={handleAddStoryPanel} />
       <div
         className={`fixed bottom-0 w-full pointer-events-none ${
           showAddStoryPanel ? "" : "translate-y-full"
@@ -87,7 +114,7 @@ function AddStoryPanel({
               showAddStoryPanel ? "" : "hidden"
             } `}
             onClick={() => {
-              togglePanel();
+              handleAddStoryPanel();
               emptyStory();
               setShowEmojiPicker(false);
             }}
@@ -102,6 +129,7 @@ function AddStoryPanel({
                 </span>
                 <span className="text-lg md:text-xl w-full font-semibold">
                   <input
+                    name="title"
                     type="text"
                     placeholder="Enter Title.."
                     value={story.title}
@@ -123,6 +151,7 @@ function AddStoryPanel({
             </div>
             <span className="text-sm mx-2">
               <textarea
+                name="content"
                 value={story.content}
                 onChange={(e) =>
                   setStory((prev) => ({ ...prev, content: e.target.value }))
@@ -142,6 +171,7 @@ function AddStoryPanel({
               </button>
               <span className="">
                 <input
+                  name="emojis"
                   type="text"
                   disabled
                   value={story.emojis.join("")}
@@ -201,6 +231,7 @@ function AddStoryPanel({
             <span className="text-xs text-gray-400/80">
               # Tags:{" "}
               <input
+                name="tags"
                 type="text"
                 value={story.tags.join(",")}
                 onChange={(e) => {

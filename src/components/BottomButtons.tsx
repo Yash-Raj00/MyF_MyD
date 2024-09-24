@@ -1,10 +1,5 @@
-// import React from "react";
-
-import { Writing } from "../types/writing";
-
 export type BottomPanelProps = {
   togglePanel: () => void;
-  // showAddStoryPanel: boolean;
 }
 
 function BottomPanel({ togglePanel }: BottomPanelProps) {
