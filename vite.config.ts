@@ -7,9 +7,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://mf-md.onrender.com/',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        target: 'https://mf-md.onrender.com',
+        // changeOrigin: true,
+        // rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },
